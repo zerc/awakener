@@ -15,6 +15,6 @@ struct response {
     char *body;
 };
 
-void handle_request(struct request req, struct response *res);
-int start_sever();
+struct response handle_request(struct request req);
+int start_server(void);
 #endif //AWAKENER_SERVER_H

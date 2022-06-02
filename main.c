@@ -14,11 +14,29 @@
 
 //char *msg = "HTTP/1.1 200 OK\nContent-Type: text/html;charset=utf-8\n\nHello!\n";
 // Web server MVP
+struct response handle_request(const struct request req) {
+    struct response resp;
+    //memcpy(&resp, 0, sizeof resp);
 
+    if (strcmp(req.path, "/") == 0) {
+        resp.body = "hello";
+        resp.code = "200 OK";
+    } else if ((
+            strcmp(req.method, "POST") +
+            strcmp(req.path, "/awake/")) == 0) {
+        resp.body = "awoken!";
+        resp.code = "200 OK";
+    } else {
+        resp.body = "Not Found";
+        resp.code = "404 NOT FOUND";
+    }
+
+    return resp;
+}
 
 
 int main() {
-    start_sever();
+    return start_server();
 }
 
 // Magic packet MVP

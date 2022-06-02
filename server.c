@@ -117,10 +117,10 @@ int start_server() {
             parse_request(buff, &r);
             printf("method %s path %s", r.method, r.path);
 
-            handle_request(r, &resp);
+            resp = handle_request(r);
 
             char full_resp[200];
-            sprintf(full_resp, "HTTP/1.1 %s\nContent-Type: text/html;charset=utf-8\n%s", resp.code, resp.body);
+            sprintf(full_resp, "HTTP/1.1 %s\nContent-Type: text/html;charset=utf-8\n\n%s\n", resp.code, resp.body);
             int len, bytes_sent;
             len = strlen(full_resp);
 
@@ -135,9 +135,4 @@ int start_server() {
 
         close(s_new);
     }
-}
-
-void handle_request(const struct request req, struct response *res) {
-    strcpy(res->body, "hello");
-    strcpy(res->code, "200 OK");
 }
