@@ -3,9 +3,31 @@
 #include <netdb.h>
 #include <string.h>
 #include <libc.h>
+#include <errno.h>
+
+int main(void) {
+    const char input[] = "aa:bb:cc";
+    char out[10];
+    sscanf(input, "%s", &out[0], &out[1]);
+    printf(out);
+    return 0;
+}
+
+void sigchld_handler(int s)
+{
+    // https://beej.us/guide/bgnet/html/#listen
+    (void)s; // quiet unused variable warning
+
+    // waitpid() might overwrite errno, so we save and restore it:
+    int saved_errno = errno;
+
+    while(waitpid(-1, NULL, WNOHANG) > 0);
+
+    errno = saved_errno;
+}
 
 // Web server MVP
-int main() {
+int main2() {
     struct addrinfo hints, *res;
 
     memset(&hints, 0, sizeof hints);
@@ -53,6 +75,15 @@ int main() {
     socklen_t inc_add_size;
     inc_add_size = sizeof inc_addr;
 
+    struct sigaction sa;
+    sa.sa_handler = sigchld_handler; // reap all dead processes
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+
     char buff[1000];
     int bytes_read;
 
@@ -65,33 +96,33 @@ int main() {
             return 2;
         }
 
-        if ((bytes_read = recv(s_new, buff, 999, 0)) == -1) {
-            perror('recv error');
-            close(s_new);
-            break;
-        }
-
-        buff[bytes_read] = '\0';
-        printf("received '%s'\n", buff);
-
-        char *msg = "HTTP/1.1 200 OK\nContent-Type: text/html;charset=utf-8\n\nHello!\n";
-        int len, bytes_sent;
-        len = strlen(msg);
-
-        if ((bytes_sent = send(s_new, msg, len, 0)) == -1) {
-            perror("send error");
-            close(s_new);
+        if (!fork()) {
             close(s);
-            return 2;
+
+            if ((bytes_read = recv(s_new, buff, 999, 0)) == -1) {
+                perror('recv error');
+                close(s_new);
+                exit(1);
+            }
+
+            buff[bytes_read] = '\0';
+            printf("received '%s'\n", buff);
+
+            char *msg = "HTTP/1.1 200 OK\nContent-Type: text/html;charset=utf-8\n\nHello!\n";
+            int len, bytes_sent;
+            len = strlen(msg);
+
+            if ((bytes_sent = send(s_new, msg, len, 0)) == -1) {
+                perror("send error");
+                close(s_new);
+                exit(1);
+            }
+            close(s_new);
+            exit(0);
         }
 
         close(s_new);
-        break;
     }
-
-    close(s);
-    printf("all done");
-    return 0;
 }
 
 // Magic packet MVP
