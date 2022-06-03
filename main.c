@@ -110,7 +110,7 @@ int send_magic_packet() {
 
     if (sendto(s, &msg, 102, 0, res->ai_addr, res->ai_addrlen) == -1) {
         perror("send error");
-        //close(s);
+        close(s);
         return 2;
     }
 
