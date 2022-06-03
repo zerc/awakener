@@ -1,5 +1,8 @@
 # Awakener
 ## Intro
+
+![in action](awakener.gif)
+
 **THIS PROJECT IS NOT A PRODUCT** but rather an improvisation for the sake of learning and fun. Do not expect it to 
 work for you or to be somewhat close to production quality.
 
@@ -30,3 +33,41 @@ how it's doing (I've used it a few years ago) and with a hope it will sort most 
 
 
 ## Deploy
+
+**TODO: there is for sure a room for improvement!**
+
+Use `ReleaseAarch` target to build the binary on the Raspberry Pi server.
+Note the target directory, it will be something like `/tmp/tmp.2gOYvaraa/cmake-build-releaseaarch`. 
+
+*I couldn't figure out how to do cross-compilation on my Mac so here we are. Probably, should have used Docker for 
+that tho.*
+
+SSH to the server the copy files from it to the web folder:
+
+```shell
+cp BUILD_DIR/awakener /var/www/awakener
+cp -r BUILD_DIR/public /var/www/awakener
+sudo chown -R www-data:www-data /var/www/awakener
+sudo chmod 700 /var/www/awakener/awakener
+```
+
+The process runs via `supervisorctl` with `awakener.conf` config. If changed, upload it to `/etc/supervisor/conf.
+d/awakener.conf` and then:
+
+```shell
+sudo supervisorctl reread
+sudo supervisorctl restart awakener
+```
+
+Even tho it's a standalone web server it runs behind lighttpd and the config is `lighttpd.conf`. Put its content 
+into `/etc/lighttpd/external.conf`. Validate the config:
+
+```shell
+sudo /etc/init.d/lighttpd configtest
+```
+
+Restart lighttpd:
+
+```shell
+sudo /etc/init.d/lighttpd reload
+```
