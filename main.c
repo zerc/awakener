@@ -3,31 +3,50 @@
 #include <netdb.h>
 #include <string.h>
 #include <libc.h>
-#include <errno.h>
 
 #include "server.h"
 
+int send_magic_packet();
+
+size_t read_public_file(char *file_name, char *buffer) {
+    FILE *f;
+    size_t total_read, read;
+
+    char actual_path[100];
+    char *path;
+    path = realpath(file_name, actual_path);
+
+    if ((f = fopen(path, "r")) == NULL) {
+        perror("open file");
+        exit(1);
+    }
+    while ((read = fread(buffer, 1,RESPONSE_BODY_SIZE, f)) > 0) {
+        total_read += read;
+    }
+    fclose(f);
+    return total_read;
+}
 
 
-
-
-
-//char *msg = "HTTP/1.1 200 OK\nContent-Type: text/html;charset=utf-8\n\nHello!\n";
-// Web server MVP
 struct response handle_request(const struct request req) {
     struct response resp;
-    //memcpy(&resp, 0, sizeof resp);
 
     if (strcmp(req.path, "/") == 0) {
-        resp.body = "hello";
+        resp.body_size = read_public_file("./public/index.html", resp.body);
         resp.code = "200 OK";
     } else if ((
             strcmp(req.method, "POST") +
             strcmp(req.path, "/awake/")) == 0) {
-        resp.body = "awoken!";
+        if (send_magic_packet() != 0) {
+            strcpy(resp.body, "error!");
+        } else {
+            strcpy(resp.body, "awoken!");
+        }
+        resp.body_size = 8;
         resp.code = "200 OK";
     } else {
-        resp.body = "Not Found";
+        strcpy(resp.body, "Not Found");
+        resp.body_size = 10;
         resp.code = "404 NOT FOUND";
     }
 
@@ -39,8 +58,7 @@ int main() {
     return start_server();
 }
 
-// Magic packet MVP
-int main1() {
+int send_magic_packet() {
     struct addrinfo hints, *res;
 
     memset(&hints, 0, sizeof hints);

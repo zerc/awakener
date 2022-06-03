@@ -94,9 +94,6 @@ int start_server() {
     struct request r;
     memset(&r, 0, sizeof r);
 
-    struct response resp;
-    memset(&r, 0, sizeof resp);
-
     while (1) {
         if ((s_new = accept(s, (struct sockaddr *) &inc_addr, &inc_add_size)) == -1) {
             perror("accept error");
@@ -117,14 +114,14 @@ int start_server() {
             parse_request(buff, &r);
             printf("method %s path %s", r.method, r.path);
 
+            struct response resp;
             resp = handle_request(r);
 
-            char full_resp[200];
+            char full_resp[2000];
             sprintf(full_resp, "HTTP/1.1 %s\nContent-Type: text/html;charset=utf-8\n\n%s\n", resp.code, resp.body);
-            int len, bytes_sent;
-            len = strlen(full_resp);
+            int bytes_sent;
 
-            if ((bytes_sent = send(s_new, full_resp, len, 0)) == -1) {
+            if ((bytes_sent = send(s_new, full_resp, resp.body_size+55, 0)) == -1) {
                 perror("send error");
                 close(s_new);
                 exit(1);
