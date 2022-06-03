@@ -3,13 +3,15 @@
 //
 #include <stdio.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netdb.h>
 #include <string.h>
-#include <libc.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
 
 #include "server.h"
-
 
 void sigchld_handler(int s)
 {

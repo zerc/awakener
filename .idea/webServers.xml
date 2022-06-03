@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="69b1276e-9482-418a-a0cc-25453c75299a" name="raspi" url="http://awakener">
+        <fileTransfer rootFolder="/var/www" accessType="SFTP" host="192.168.1.118" port="22" sshConfigId="f3bbd04c-beb4-42af-ad54-06bb497bc88f" sshConfig="zero13cool@192.168.1.118:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseRsync="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

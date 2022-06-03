@@ -2,7 +2,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
-#include <libc.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "server.h"
 
@@ -109,7 +110,7 @@ int send_magic_packet() {
 
     if (sendto(s, &msg, 102, 0, res->ai_addr, res->ai_addrlen) == -1) {
         perror("send error");
-        close(s);
+        //close(s);
         return 2;
     }
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="raspi" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="raspi">
+        <serverdata>
+          <mappings>
+            <mapping deploy="awakener" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="raspi (13763691-f8ca-4b07-b201-bc8ee21d51bb)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/tmp.2gOYvR7Vj5" local="$PROJECT_DIR$" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-releaseaarch" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
