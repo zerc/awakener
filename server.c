@@ -1,15 +1,15 @@
 //
 // Created by Vladimir Savin on 02/06/2022.
 //
+#include <errno.h>
+#include <netdb.h>
+#include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
-#include <netdb.h>
-#include <string.h>
-#include <errno.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
 
 #include "server.h"
 
@@ -21,17 +21,20 @@ void sigchld_handler(int s)
     // waitpid() might overwrite errno, so we save and restore it:
     int saved_errno = errno;
 
-    while(waitpid(-1, NULL, WNOHANG) > 0);
+    while (waitpid(-1, NULL, WNOHANG) > 0)
+        ;
 
     errno = saved_errno;
 }
 
-int parse_request(char *buf, struct request *r) {
+int parse_request(char *buf, struct request *r)
+{
     sscanf(buf, "%s %s", r->method, r->path);
     return 0;
 }
 
-int start_server() {
+int start_server()
+{
     struct addrinfo hints, *res;
 
     memset(&hints, 0, sizeof hints);
@@ -39,26 +42,30 @@ int start_server() {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if (getaddrinfo("127.0.0.1", "8888", &hints, &res) != 0) {
+    if (getaddrinfo("127.0.0.1", "8888", &hints, &res) != 0)
+    {
         perror("getaddrinfo error");
         return 2;
     }
     printf("info collected\n");
 
     int s;
-    if ((s = socket(PF_INET, res->ai_socktype, res->ai_protocol)) == -1) {
+    if ((s = socket(PF_INET, res->ai_socktype, res->ai_protocol)) == -1)
+    {
         perror("socket error");
         return 2;
     }
 
     int yes = 1;
-    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
+    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1)
+    {
         perror("setsockopt");
         return 2;
     }
     printf("socket created\n");
 
-    if (bind(s, res->ai_addr, res->ai_addrlen) == -1) {
+    if (bind(s, res->ai_addr, res->ai_addrlen) == -1)
+    {
         perror("bind error");
         close(s);
         return 2;
@@ -66,7 +73,8 @@ int start_server() {
 
     printf("socket binded\n");
 
-    if (listen(s, 10) == -1) {
+    if (listen(s, 10) == -1)
+    {
         perror("listen error");
         close(s);
         return 2;
@@ -83,7 +91,8 @@ int start_server() {
     sa.sa_handler = sigchld_handler; // reap all dead processes
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+    if (sigaction(SIGCHLD, &sa, NULL) == -1)
+    {
         perror("sigaction");
         exit(1);
     }
@@ -96,17 +105,21 @@ int start_server() {
     struct request r;
     memset(&r, 0, sizeof r);
 
-    while (1) {
-        if ((s_new = accept(s, (struct sockaddr *) &inc_addr, &inc_add_size)) == -1) {
+    while (1)
+    {
+        if ((s_new = accept(s, (struct sockaddr *)&inc_addr, &inc_add_size)) == -1)
+        {
             perror("accept error");
             close(s);
             return 2;
         }
 
-        if (!fork()) {
+        if (!fork())
+        {
             close(s);
 
-            if ((bytes_read = recv(s_new, buff, 999, 0)) == -1) {
+            if ((bytes_read = recv(s_new, buff, 999, 0)) == -1)
+            {
                 perror("recv error");
                 close(s_new);
                 exit(1);
@@ -123,7 +136,8 @@ int start_server() {
             sprintf(full_resp, "HTTP/1.1 %s\nContent-Type: text/html;charset=utf-8\n\n%s\n", resp.code, resp.body);
             int bytes_sent;
 
-            if ((bytes_sent = send(s_new, full_resp, resp.body_size+55, 0)) == -1) {
+            if ((bytes_sent = send(s_new, full_resp, resp.body_size + 55, 0)) == -1)
+            {
                 perror("send error");
                 close(s_new);
                 exit(1);
