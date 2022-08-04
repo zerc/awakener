@@ -17,9 +17,10 @@ struct response
 {
     char *code;
     char body[RESPONSE_BODY_SIZE];
-    size_t body_size;
+    int body_size;
 };
 
 struct response handle_request(struct request req);
 int start_server(void);
+int parse_request(char *buf, struct request *r);
 #endif // AWAKENER_SERVER_H
