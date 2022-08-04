@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 17)
 add_executable(awakener src/server.h src/server.c src/main.c)
 add_subdirectory(vendor/check)
 
-add_executable(awakener_check tests/check_request.c)
+add_executable(awakener_check tests/check_request.c src/server.c)
 
 set(STATIC_LIBS check)
 message("Using static libs: ${STATIC_LIBS}")

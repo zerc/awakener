@@ -2,9 +2,23 @@
 #include <check.h>
 #include <stdlib.h>
 
+struct response handle_request(struct request req)
+{
+    struct response r;
+    return r;
+}
+
 START_TEST(test_parse_request)
 {
-    ck_assert_int_eq(5, 5);
+    struct request r;
+    memset(&r, 0, sizeof r);
+
+    char buff[] = "GET /foo\nContent-Encoding: gzip\n\n<html><body>Hello</body></html>\0";
+
+    parse_request(buff, &r);
+
+    ck_assert_str_eq(r.method, "GET");
+    ck_assert_str_eq(r.path, "/foo");
 }
 END_TEST
 
